@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.18)
 
-project(FlowForge LANGUAGES CXX)
+project(Plugins LANGUAGES CXX)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
@@ -17,4 +17,32 @@ if(CMAKE_CONFIGURATION_TYPES)
     endforeach()
 endif()
 
-add_subdirectory(Plugins)
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
+endif()
+
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+    add_compile_options(
+            -Wall -Wextra -Wpedantic
+            -Wconversion -Wsign-conversion
+            -Wshadow -Wformat=2
+    )
+endif()
+
+# ---- Boost.Json для всех поддиректорий ----
+find_package(boost_json CONFIG REQUIRED)
+
+if (TARGET boost_json::boost_json)
+    add_library(Boost::json ALIAS boost_json::boost_json)
+endif()
+
+link_libraries(Boost::json)
+# -------------------------------------------
+
+add_subdirectory(PlugSRT)
+
+install(DIRECTORY DESTINATION bin)
