@@ -9,6 +9,8 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 find_package(Threads REQUIRED)
 
+find_package(OpenSSL REQUIRED)
+
 # --- libsrt detection (prefer pkg-config). Create INTERFACE imported target ---
 find_package(PkgConfig QUIET)
 if(PKG_CONFIG_FOUND)
@@ -48,17 +50,17 @@ endif()
 
 add_library(PlugSRT SHARED
         PlugSRT.cpp
-        ${CMAKE_SOURCE_DIR}/Config.cpp)
+        ${CMAKE_CURRENT_SOURCE_DIR}/../Config.cpp)
 
 # Если нужен общий инклуд корня проекта
-target_include_directories(PlugSRT PUBLIC
-        ${CMAKE_SOURCE_DIR}
-)
+target_include_directories(PlugSRT PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
 
 # Можно убрать, если не используешь boost::asio
 target_compile_definitions(PlugSRT PRIVATE BOOST_ASIO_NO_DEPRECATED)
 
 target_link_libraries(PlugSRT PRIVATE
+        OpenSSL::Crypto
+        OpenSSL::SSL
         SRT::SRT
         Threads::Threads
 )
